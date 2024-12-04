@@ -52,5 +52,6 @@ public class User {
         if (lastName == null || lastName.isEmpty() || lastName.isBlank()) {
             throw new IllegalArgumentException("Last name cannot be null or empty");
         }
+        this.lastName = lastName;
     }
 }
