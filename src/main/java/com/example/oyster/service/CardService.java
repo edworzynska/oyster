@@ -3,6 +3,7 @@ package com.example.oyster.service;
 import com.example.oyster.dto.CardDTO;
 import com.example.oyster.dto.CardMapper;
 import com.example.oyster.model.Card;
+import com.example.oyster.model.User;
 import com.example.oyster.repository.CardRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -15,10 +16,7 @@ import java.util.UUID;
 @Service
 public class CardService {
 
-    @Autowired
     private CardRepository cardRepository;
-
-    @Autowired
     private final CardMapper cardMapper;
 
     public CardService(CardRepository cardRepository, CardMapper cardMapper) {
@@ -33,7 +31,16 @@ public class CardService {
         return cardMapper.toDTO(card);
     }
 
-    public Long generateUniqueCardNumber(){
+    @Transactional
+    public CardDTO createCard(User user){
+        Card card = new Card(generateUniqueCardNumber());
+        card.setUser(user);
+        cardRepository.save(card);
+
+        return cardMapper.toDTO(card);
+    }
+
+    private Long generateUniqueCardNumber(){
         Long cardNumber;
         do {
             UUID uuid = UUID.randomUUID();

@@ -1,6 +1,9 @@
 package com.example.oyster.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,6 +21,7 @@ public class User {
     private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
+    @Email(message = "Email is not valid")
     private String email;
 
     @Column(name = "first_name", nullable = false)
@@ -38,7 +42,7 @@ public class User {
 
     public void setEmail(String email) {
         if (email == null || email.isEmpty() || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot empty");
+            throw new IllegalArgumentException("Email cannot be empty");
         }
         this.email = email;
     }
@@ -50,7 +54,7 @@ public class User {
     }
     public void setLastName(String lastName) {
         if (lastName == null || lastName.isEmpty() || lastName.isBlank()) {
-            throw new IllegalArgumentException("Last name cannot be null or empty");
+            throw new IllegalArgumentException("Last name cannot be empty");
         }
         this.lastName = lastName;
     }
