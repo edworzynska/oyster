@@ -120,37 +120,59 @@ class UserServiceIntegrationTest {
         assertEquals("Last name cannot be empty", e.getMessage());
     }
 
-//    @Test
-//    void throwsAnErrorIfPasswordIsEmpty() {
-//        InvalidParameterException e = assertThrows(InvalidParameterException.class, ()-> userService.createUser("", "Test User", "pass"));
-//        assertEquals("Provided email address is invalid!", e.getMessage());
-//    }
-//
-//    @Test
-//    void throwsAnErrorIfPasswordIsInvalid1() {
-//        SecurityException e = assertThrows(SecurityException.class, ()-> userService.createUser("email@email.com", "test_user", "pass"));
-//        assertEquals("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!", e.getMessage());
-//    }
-//    @Test
-//    void throwsAnErrorIfPasswordIsInvalid2() {
-//        SecurityException e = assertThrows(SecurityException.class, ()-> userService.createUser("email@email.com", "test_user", "passwordd"));
-//        assertEquals("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!", e.getMessage());
-//    }
-//    @Test
-//    void throwsAnErrorIfPasswordIsInvalid3() {
-//        SecurityException e = assertThrows(SecurityException.class, ()-> userService.createUser("email@email.com", "test_user", "11111111"));
-//        assertEquals("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!", e.getMessage());
-//    }
-//    @Test
-//    void throwsAnErrorIfPasswordIsInvalid4() {
-//        SecurityException e = assertThrows(SecurityException.class, ()-> userService.createUser("email@email.com", "test_user", "$$$$$$$$"));
-//        assertEquals("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!", e.getMessage());
-//    }
-//
-//    @Test
-//    void throwsAnErrorIfCreatingUserWithEmptyName() {
-//        InvalidParameterException e = assertThrows(InvalidParameterException.class, ()-> userService.createUser("email@email.com", "", "$$$Pass1$$$$$"));
-//        assertEquals("Username must be 3-15 characters long and contain only letters, numbers and underscores.", e.getMessage());
-//
-//    }
+    @Test
+    void throwsAnErrorIfCreatingUserWithEmptyPassword() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        String weakPasswordMessage = "Password must be at least 8 characters long, must contain at least one special character, one letter and one number!";
+        assertEquals(weakPasswordMessage, e.getMessage());
+    }
+    @Test
+    void throwsAnErrorIfCreatingUserWithWeakPassword() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "pass";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        String weakPasswordMessage = "Password must be at least 8 characters long, must contain at least one special character, one letter and one number!";
+        assertEquals(weakPasswordMessage, e.getMessage());
+    }
+    @Test
+    void throwsAnErrorIfCreatingUserWithWeakPassword2() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "password";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        String weakPasswordMessage = "Password must be at least 8 characters long, must contain at least one special character, one letter and one number!";
+        assertEquals(weakPasswordMessage, e.getMessage());
+    }
+    @Test
+    void throwsAnErrorIfCreatingUserWithWeakPassword3() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "password1";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        String weakPasswordMessage = "Password must be at least 8 characters long, must contain at least one special character, one letter and one number!";
+        assertEquals(weakPasswordMessage, e.getMessage());
+    }
+    @Test
+    void throwsAnErrorIfCreatingUserWithWeakPassword4() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "pass@word";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        String weakPasswordMessage = "Password must be at least 8 characters long, must contain at least one special character, one letter and one number!";
+        assertEquals(weakPasswordMessage, e.getMessage());
+    }
 }
