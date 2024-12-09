@@ -1,17 +1,23 @@
 package com.example.oyster.dto;
 
 import com.example.oyster.model.Card;
+import com.example.oyster.model.User;
+import com.example.oyster.repository.UserRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public interface CardMapper {
+public abstract class CardMapper {
 
-    CardMapper INSTANCE = Mappers.getMapper(CardMapper.class);
+    @Autowired
+    UserRepository userRepository;
 
-    CardDTO toDTO(Card card);
+    @Mapping(target = "userId", source = "user.id")
+    public abstract CardDTO toDTO(Card card);
 
-    @Mapping(target = "user", ignore = true)
-    Card toEntity(CardDTO cardDTO);
+    @Mapping(target = "user", expression = "java(userRepository.findById(cardDTO.getUserId()).orElse(null))")
+    public abstract Card toEntity(CardDTO cardDTO);
 }

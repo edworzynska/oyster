@@ -2,6 +2,7 @@ package com.example.oyster.dto;
 
 import lombok.Value;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -11,5 +12,6 @@ public class CardDTO {
     Long cardNumber;
     Long userId;
     LocalDateTime issuedAt;
+    BigDecimal balance;
 
 }

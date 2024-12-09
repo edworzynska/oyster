@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 
@@ -40,7 +41,7 @@ class CardServiceTest {
         Card card = new Card(123456789L);
         card.setId(cardId);
 
-        CardDTO cardDTO = new CardDTO(cardId, 123456789L, null, null);
+        CardDTO cardDTO = new CardDTO(cardId, 123456789L, null, null, BigDecimal.ZERO);
 
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         when(cardMapper.toDTO(card)).thenReturn(cardDTO);
@@ -65,20 +66,20 @@ class CardServiceTest {
     }
 
     @Test
-    void testCreateCard() {
+    void testCreateRegisteredCard() {
         User user = new User();
         user.setId(1L);
 
         Card card = new Card(123456789L);
         card.setUser(user);
 
-        CardDTO cardDTO = new CardDTO(1L, 123456789L, user.getId(), null);
+        CardDTO cardDTO = new CardDTO(1L, 123456789L, user.getId(), null, BigDecimal.ZERO);
 
         when(cardRepository.existsByCardNumber(anyLong())).thenReturn(false);
         when(cardRepository.save(any(Card.class))).thenReturn(card);
         when(cardMapper.toDTO(any(Card.class))).thenReturn(cardDTO);
 
-        CardDTO result = cardService.createCard(user);
+        CardDTO result = cardService.createRegisteredCard(user);
 
         assertNotNull(result);
         assertEquals(123456789L, result.getCardNumber());
@@ -98,13 +99,13 @@ class CardServiceTest {
         card.setId(1L);
         card.setUser(user);
 
-        CardDTO cardDTO = new CardDTO(1L, generatedCardNumber, user.getId(), null);
+        CardDTO cardDTO = new CardDTO(1L, generatedCardNumber, user.getId(), null, BigDecimal.ZERO);
 
         when(cardRepository.existsByCardNumber(anyLong())).thenReturn(false);
         when(cardRepository.save(any(Card.class))).thenReturn(card);
         when(cardMapper.toDTO(any(Card.class))).thenReturn(cardDTO);
 
-        CardDTO result = cardService.createCard(user);
+        CardDTO result = cardService.createRegisteredCard(user);
 
         assertNotNull(result, "CardDTO should not be null");
         assertNotNull(result.getCardNumber(), "Card number should not be null");

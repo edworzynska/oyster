@@ -16,13 +16,11 @@ import java.util.UUID;
 @Service
 public class CardService {
 
+    @Autowired
     private CardRepository cardRepository;
-    private final CardMapper cardMapper;
 
-    public CardService(CardRepository cardRepository, CardMapper cardMapper) {
-        this.cardRepository = cardRepository;
-        this.cardMapper = cardMapper;
-    }
+    @Autowired
+    private CardMapper cardMapper;
 
     public CardDTO getCard(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() ->
@@ -31,10 +29,26 @@ public class CardService {
         return cardMapper.toDTO(card);
     }
 
+    public CardDTO getCardByCardNumber(Long cardNumber){
+        Card card = cardRepository.findByCardNumber(cardNumber);
+        if (card == null) {
+            throw new EntityNotFoundException("card not found");
+        }
+        return cardMapper.toDTO(card);
+    }
+
     @Transactional
-    public CardDTO createCard(User user){
+    public CardDTO createRegisteredCard(User user){
         Card card = new Card(generateUniqueCardNumber());
         card.setUser(user);
+        cardRepository.save(card);
+
+        return cardMapper.toDTO(card);
+    }
+
+    @Transactional
+    public CardDTO createUnregisteredCard(){
+        Card card = new Card(generateUniqueCardNumber());
         cardRepository.save(card);
 
         return cardMapper.toDTO(card);
@@ -46,7 +60,7 @@ public class CardService {
             UUID uuid = UUID.randomUUID();
             cardNumber =  Math.abs(uuid.getMostSignificantBits() % 1000000000000L);
         }
-        while (cardRepository.existsByCardNumber(cardNumber));
+        while (cardRepository.existsByCardNumber(cardNumber) && cardNumber.toString().length() != 12);
 
         return cardNumber;
     }
