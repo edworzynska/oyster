@@ -24,7 +24,7 @@ public class Card {
     private Long cardNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", updatable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @CreationTimestamp

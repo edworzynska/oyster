@@ -64,4 +64,15 @@ public class CardService {
 
         return cardNumber;
     }
+
+    @Transactional
+    public CardDTO registerCard(Long cardNumber, User user){
+        Card card = cardRepository.findByCardNumber(cardNumber);
+        if (card == null || card.getUser() != null) {
+            throw new IllegalArgumentException("invalid card number");
+        }
+        card.setUser(user);
+        cardRepository.save(card);
+        return cardMapper.toDTO(card);
+    }
 }

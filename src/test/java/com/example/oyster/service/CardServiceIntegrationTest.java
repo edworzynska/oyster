@@ -1,6 +1,7 @@
 package com.example.oyster.service;
 
 import com.example.oyster.dto.CardDTO;
+import com.example.oyster.model.Card;
 import com.example.oyster.model.User;
 import com.example.oyster.repository.CardRepository;
 import com.example.oyster.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,5 +100,40 @@ public class CardServiceIntegrationTest {
     void throwsErrorIfUnableToFindCardByCardNumber() {
         EntityNotFoundException e = assertThrows(EntityNotFoundException.class, () -> cardService.getCardByCardNumber(123456789L));
         assertEquals("card not found", e.getMessage());
+    }
+
+    @Test
+    void canRegisterUnregisteredCard() {
+        CardDTO cardDTO = cardService.createUnregisteredCard();
+        Long cardNumber = cardDTO.getCardNumber();
+        Long userId = testUser.getId();
+        cardDTO = cardService.registerCard(cardNumber, testUser);
+
+        Card card = cardRepository.findByCardNumber(cardNumber);
+
+        assertEquals(card.getCardNumber(), cardDTO.getCardNumber());
+        assertNotNull(cardDTO);
+
+        assertEquals(card.getUser().getId(), cardDTO.getUserId());
+        assertEquals(1, cardRepository.findByUserId(userId).size());
+    }
+
+    @Test
+    void cannotRegisterRegisteredCard() {
+        CardDTO cardDTO = cardService.createRegisteredCard(testUser);
+        Long cardNumber = cardDTO.getCardNumber();
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
+                cardService.registerCard(cardNumber, testUser));
+        assertEquals("invalid card number", e.getMessage());
+    }
+    @Test
+    void cannotRegisterUnissuedCard() {
+
+        Long cardNumber = 999999999999L;
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
+                cardService.registerCard(cardNumber, testUser));
+        assertEquals("invalid card number", e.getMessage());
     }
 }
