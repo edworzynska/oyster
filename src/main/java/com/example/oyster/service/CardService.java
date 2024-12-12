@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.util.UUID;
 
 @Service
@@ -74,5 +76,15 @@ public class CardService {
         card.setUser(user);
         cardRepository.save(card);
         return cardMapper.toDTO(card);
+    }
+
+    @Transactional
+    public void addBalance(Long cardNumber, BigDecimal amount){
+        Card card = cardRepository.findByCardNumber(cardNumber);
+        if (card == null){
+            throw new InvalidParameterException("invalid card number");
+        }
+        card.setBalance(card.getBalance().add(amount));
+        cardRepository.save(card);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.List;
 
@@ -134,6 +135,39 @@ public class CardServiceIntegrationTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
                 cardService.registerCard(cardNumber, testUser));
+        assertEquals("invalid card number", e.getMessage());
+    }
+
+    @Test
+    void addsPositiveBalanceToValidCard() {
+        CardDTO cardDTO = cardService.createUnregisteredCard();
+        Long cardNumber = cardDTO.getCardNumber();
+        Card card = cardRepository.findByCardNumber(cardNumber);
+        assertEquals(BigDecimal.ZERO, card.getBalance());
+
+        cardService.addBalance(cardNumber, BigDecimal.TEN);
+
+        assertEquals(BigDecimal.TEN, card.getBalance());
+    }
+
+    @Test
+    void addsBalanceWhenCurrentBalanceIsGreaterThanZero() {
+        CardDTO cardDTO = cardService.createUnregisteredCard();
+        Long cardNumber = cardDTO.getCardNumber();
+        Card card = cardRepository.findByCardNumber(cardNumber);
+        card.setBalance(BigDecimal.TWO);
+        assertEquals(BigDecimal.TWO, card.getBalance());
+
+        cardService.addBalance(cardNumber, BigDecimal.TEN);
+
+        assertEquals(new BigDecimal(12), card.getBalance());
+    }
+
+    @Test
+    void throwsInvalidParameterErrorIfCardNumberIsInvalid() {
+        Long cardNumber = 999999L;
+        InvalidParameterException e = assertThrows(InvalidParameterException.class, () ->
+                cardService.addBalance(cardNumber, new BigDecimal(15)));
         assertEquals("invalid card number", e.getMessage());
     }
 }
