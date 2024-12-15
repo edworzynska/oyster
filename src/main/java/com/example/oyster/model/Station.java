@@ -19,6 +19,6 @@ public class Station {
     private String name;
 
     @Column(name = "zone", nullable = false)
-    private Zone zone;
+    private Integer zone;
 
 }

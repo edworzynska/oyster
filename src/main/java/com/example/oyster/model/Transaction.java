@@ -2,6 +2,7 @@ package com.example.oyster.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "Transactions")
+@NoArgsConstructor
 public class Transaction {
 
     @Id
