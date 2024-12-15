@@ -20,7 +20,7 @@ public class FareService {
 
         boolean isPeak = isPeakHour(LocalDateTime.now());
 
-        return fareRepository.findFare(startZone, endZone, isPeak).getFare();
+        return fareRepository.findByStartZoneAndEndZoneAndIsPeak(startZone, endZone, isPeak).getFare();
     }
 
     private boolean isPeakHour(LocalDateTime dateTime) {

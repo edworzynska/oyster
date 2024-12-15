@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface FareRepository extends JpaRepository<Fare, Long> {
 
-    Fare findFare(Integer startZone, Integer endZone, Boolean isPeak);
+    Fare findByStartZoneAndEndZoneAndIsPeak(Integer startZone, Integer endZone, Boolean isPeak);
 }

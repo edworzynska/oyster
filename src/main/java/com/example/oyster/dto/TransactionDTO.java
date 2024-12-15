@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Value
 public class TransactionDTO {
     Long id;
+    Long cardId;
     Long cardNumber;
     Station startStation;
     Station endStation;
