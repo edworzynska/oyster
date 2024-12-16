@@ -11,6 +11,8 @@ import com.example.oyster.repository.DailyCapRepository;
 import com.example.oyster.repository.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,5 +98,9 @@ public class TransactionService {
         return totalDailyFare.add(fare).compareTo(dailyCap) > 0
                 ? dailyCap.subtract(totalDailyFare)
                 : fare;
+    }
+    public Page<TransactionDTO> getAllTransactionsForCard(Long cardNumber, int page, int size) {
+        Page<Transaction> transactionPage = transactionRepository.findByCardCardNumber(cardNumber, PageRequest.of(page, size));
+        return transactionPage.map(transactionMapper::toDTO);
     }
 }

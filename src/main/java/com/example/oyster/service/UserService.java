@@ -40,7 +40,7 @@ public class UserService {
         if (!validateEmailAddress(userDTO.getEmail())) {
             throw new InvalidParameterException("Provided email address is invalid!");
         }
-        if (!validatePassword(userDTO.getPassword())){
+        if (!validatePassword(userDTO.getPassword()) || userDTO.getPassword().isEmpty()){
             throw new InvalidParameterException("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!");
         }
 

@@ -15,14 +15,12 @@ public class UserDTO {
     Long id;
     String firstName;
     String lastName;
+    String password;
 
     @Email(message = "Email is not valid")
     String email;
 
     LocalDateTime creationDate;
-
-    @JsonIgnore
-    String password;
 
     public UserDTO(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
