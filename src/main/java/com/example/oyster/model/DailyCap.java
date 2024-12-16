@@ -14,8 +14,7 @@ public class DailyCap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int startZone;
-    private int endZone;
-    private boolean peak;
+    private Integer startZone;
+    private Integer endZone;
     private BigDecimal dailyCap;
 }

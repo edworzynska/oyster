@@ -110,7 +110,8 @@ public class CardServiceIntegrationTest {
         Long userId = testUser.getId();
         cardDTO = cardService.registerCard(cardNumber, testUser);
 
-        Card card = cardRepository.findByCardNumber(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("invalid card number"));
 
         assertEquals(card.getCardNumber(), cardDTO.getCardNumber());
         assertNotNull(cardDTO);
@@ -142,7 +143,8 @@ public class CardServiceIntegrationTest {
     void addsPositiveBalanceToValidCard() {
         CardDTO cardDTO = cardService.createUnregisteredCard();
         Long cardNumber = cardDTO.getCardNumber();
-        Card card = cardRepository.findByCardNumber(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("invalid card number"));
         assertEquals(BigDecimal.ZERO, card.getBalance());
 
         cardService.addBalance(cardNumber, BigDecimal.TEN);
@@ -154,7 +156,8 @@ public class CardServiceIntegrationTest {
     void addsBalanceWhenCurrentBalanceIsGreaterThanZero() {
         CardDTO cardDTO = cardService.createUnregisteredCard();
         Long cardNumber = cardDTO.getCardNumber();
-        Card card = cardRepository.findByCardNumber(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("invalid card number"));
         card.setBalance(BigDecimal.TWO);
         assertEquals(BigDecimal.TWO, card.getBalance());
 

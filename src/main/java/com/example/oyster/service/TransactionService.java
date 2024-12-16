@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TransactionService {
@@ -39,12 +40,18 @@ public class TransactionService {
 
     @Transactional
     public TransactionDTO tapIn(Long cardNumber, Station startStation) {
-        Card card = cardRepository.findByCardNumber(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+
+        if (card.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalStateException("Insufficient balance");
+        }
 
         Transaction transaction = new Transaction();
         transaction.setCard(card);
         transaction.setStartStation(startStation);
         transaction.setStartTime(LocalDateTime.now());
+
         transactionRepository.save(transaction);
 
         return transactionMapper.toDTO(transaction);
@@ -52,7 +59,8 @@ public class TransactionService {
 
     @Transactional
     public TransactionDTO tapOut(Long cardNumber, Station endStation) {
-        Card card = cardRepository.findByCardNumber(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found"));
 
         Transaction transaction = transactionRepository.findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(card)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
@@ -64,34 +72,29 @@ public class TransactionService {
 
         BigDecimal adjustedFare = applyDailyCap(card, fare, transaction.getStartStation(), endStation);
         transaction.setFare(adjustedFare);
+        card.setBalance(card.getBalance().subtract(adjustedFare));
 
+        cardRepository.save(card);
         transactionRepository.save(transaction);
 
         return transactionMapper.toDTO(transaction);
     }
 
     private BigDecimal applyDailyCap(Card card, BigDecimal fare, Station startStation, Station endStation) {
-        int startZone = startStation.getZone();
-        int endZone = endStation.getZone();
-
         BigDecimal dailyCap = dailyCapRepository
-                .findByStartZoneAndEndZone(startZone, endZone)
+                .findByStartZoneAndEndZone(startStation.getZone(), endStation.getZone())
                 .map(DailyCap::getDailyCap)
                 .orElseThrow(() -> new IllegalArgumentException("No daily cap found for the given zones."));
 
-        LocalDate today = LocalDate.now();
-        List<Transaction> todaysTransactions = transactionRepository.findAllByCardAndStartTimeBetween(
-                card, today.atStartOfDay(), today.plusDays(1).atStartOfDay()
-        );
-
-        BigDecimal totalDailyFare = todaysTransactions.stream()
+        BigDecimal totalDailyFare = transactionRepository.findAllByCardAndStartTimeBetween(
+                        card, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
+                ).stream()
                 .map(Transaction::getFare)
+                .filter(Objects::nonNull) // Ensure no null values
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (totalDailyFare.add(fare).compareTo(dailyCap) > 0) {
-            return dailyCap.subtract(totalDailyFare);
-        }
-
-        return fare;
+        return totalDailyFare.add(fare).compareTo(dailyCap) > 0
+                ? dailyCap.subtract(totalDailyFare)
+                : fare;
     }
 }

@@ -32,10 +32,8 @@ public class CardService {
     }
 
     public CardDTO getCardByCardNumber(Long cardNumber){
-        Card card = cardRepository.findByCardNumber(cardNumber);
-        if (card == null) {
-            throw new EntityNotFoundException("card not found");
-        }
+        Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow(()->
+                new EntityNotFoundException("card not found"));
         return cardMapper.toDTO(card);
     }
 
@@ -62,15 +60,16 @@ public class CardService {
             UUID uuid = UUID.randomUUID();
             cardNumber =  Math.abs(uuid.getMostSignificantBits() % 1000000000000L);
         }
-        while (cardRepository.existsByCardNumber(cardNumber) && cardNumber.toString().length() != 12);
+        while (cardRepository.existsByCardNumber(cardNumber) || cardNumber.toString().length() != 12);
 
         return cardNumber;
     }
 
     @Transactional
     public CardDTO registerCard(Long cardNumber, User user){
-        Card card = cardRepository.findByCardNumber(cardNumber);
-        if (card == null || card.getUser() != null) {
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("invalid card number"));
+        if (card.getUser() != null){
             throw new IllegalArgumentException("invalid card number");
         }
         card.setUser(user);
@@ -80,10 +79,9 @@ public class CardService {
 
     @Transactional
     public void addBalance(Long cardNumber, BigDecimal amount){
-        Card card = cardRepository.findByCardNumber(cardNumber);
-        if (card == null){
-            throw new InvalidParameterException("invalid card number");
-        }
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new InvalidParameterException("invalid card number"));
+
         card.setBalance(card.getBalance().add(amount));
         cardRepository.save(card);
     }
