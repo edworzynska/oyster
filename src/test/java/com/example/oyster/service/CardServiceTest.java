@@ -36,7 +36,7 @@ class CardServiceTest {
     }
 
     @Test
-    void testGetCard_ExistingCard() {
+    void getsExistingCard() {
         Long cardId = 1L;
         Card card = new Card(123456789L);
         card.setId(cardId);
