@@ -26,14 +26,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/register", "/api/post-card", "/api/cards/", "/api/users/").permitAll()
+                        .requestMatchers("/login", "/api/register", "/api/post-card", "/api/cards/", "/api/users/",
+                                "/api/login").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint()))
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/api/feed", true)
+                        .defaultSuccessUrl("/api/cards/", true)
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
@@ -50,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://77.65.99.169", "http://localhost"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

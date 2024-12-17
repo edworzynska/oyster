@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -44,6 +45,12 @@ public class CardController {
         else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
+    }
+    @GetMapping("/")
+    public ResponseEntity<List<CardDTO>> getCards() {
+        User user = authenticationService.getLoggedUser();
+        List<CardDTO> cards = cardService.getCardsByUser(user);
+        return ResponseEntity.ok(cards);
     }
 
     @PostMapping("/")

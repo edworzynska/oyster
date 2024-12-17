@@ -78,5 +78,7 @@ public class UserService {
             return false;
         }
     }
-
+    public UserDTO getUserDetails(User loggedUser){
+        return userMapper.toDTO(loggedUser);
+    }
 }

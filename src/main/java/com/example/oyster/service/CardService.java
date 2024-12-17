@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,11 @@ public class CardService {
         Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow(()->
                 new EntityNotFoundException("card not found"));
         return cardMapper.toDTO(card);
+    }
+
+    public List<CardDTO> getCardsByUser(User user){
+        List<Card> cards = cardRepository.findByUserId(user.getId());
+        return cards.stream().map(cardMapper::toDTO).toList();
     }
 
     @Transactional
