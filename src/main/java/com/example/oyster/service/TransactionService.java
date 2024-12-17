@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -47,6 +48,21 @@ public class TransactionService {
 
         if (card.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Insufficient balance");
+        }
+
+        Optional<Transaction> incompleteTransactionOpt = transactionRepository
+                .findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(card);
+
+        if (incompleteTransactionOpt.isPresent()) {
+            Transaction incompleteTransaction = incompleteTransactionOpt.get();
+
+            BigDecimal maxFare = fareService.getMaxFare();
+            card.setBalance(card.getBalance().subtract(maxFare));
+
+            incompleteTransaction.setFare(maxFare);
+            incompleteTransaction.setEndStation(null);
+            incompleteTransaction.setEndTime(LocalDateTime.now());
+            transactionRepository.save(incompleteTransaction);
         }
 
         Transaction transaction = new Transaction();
@@ -99,6 +115,7 @@ public class TransactionService {
                 ? dailyCap.subtract(totalDailyFare)
                 : fare;
     }
+
     public Page<TransactionDTO> getAllTransactionsForCard(Long cardNumber, int page, int size) {
         Page<Transaction> transactionPage = transactionRepository.findByCardCardNumber(cardNumber, PageRequest.of(page, size));
         return transactionPage.map(transactionMapper::toDTO);

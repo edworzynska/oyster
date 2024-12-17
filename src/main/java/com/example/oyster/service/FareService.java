@@ -1,5 +1,6 @@
 package com.example.oyster.service;
 
+import com.example.oyster.model.Fare;
 import com.example.oyster.model.Station;
 import com.example.oyster.repository.FareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,13 @@ public class FareService {
         boolean isPeak = isPeakHour(LocalDateTime.now());
 
         return fareRepository.findByStartZoneAndEndZoneAndIsPeak(startZone, endZone, isPeak).getFare();
+    }
+
+    public BigDecimal getMaxFare() {
+        return fareRepository.findAll().stream()
+                .map(Fare::getFare)
+                .max(BigDecimal::compareTo)
+                .orElseThrow(() -> new IllegalStateException("No fares found in the system"));
     }
 
     private boolean isPeakHour(LocalDateTime dateTime) {
