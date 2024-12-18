@@ -56,7 +56,7 @@ public class TransactionService {
         if (incompleteTransactionOpt.isPresent()) {
             Transaction incompleteTransaction = incompleteTransactionOpt.get();
 
-            BigDecimal maxFare = fareService.getMaxFare();
+            BigDecimal maxFare = fareService.getMaxFare(startStation);
             card.setBalance(card.getBalance().subtract(maxFare));
 
             incompleteTransaction.setFare(maxFare);
@@ -104,9 +104,10 @@ public class TransactionService {
                 .map(DailyCap::getDailyCap)
                 .orElseThrow(() -> new IllegalArgumentException("No daily cap found for the given zones."));
 
-        BigDecimal totalDailyFare = transactionRepository.findAllByCardAndStartTimeBetween(
+        List<Transaction> transactionsFromDay = transactionRepository.findAllByCardAndStartTimeBetween(
                         card, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
-                ).stream()
+                );
+        BigDecimal totalDailyFare = transactionsFromDay.stream()
                 .map(Transaction::getFare)
                 .filter(Objects::nonNull) // Ensure no null values
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

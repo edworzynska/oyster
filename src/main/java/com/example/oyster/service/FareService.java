@@ -21,14 +21,12 @@ public class FareService {
 
         boolean isPeak = isPeakHour(LocalDateTime.now());
 
-        return fareRepository.findByStartZoneAndEndZoneAndIsPeak(startZone, endZone, isPeak).getFare();
+        return fareRepository.findByStartZoneAndEndZoneAndIsPeak(startZone, endZone, isPeak).orElseThrow().getFare();
     }
 
-    public BigDecimal getMaxFare() {
-        return fareRepository.findAll().stream()
-                .map(Fare::getFare)
-                .max(BigDecimal::compareTo)
-                .orElseThrow(() -> new IllegalStateException("No fares found in the system"));
+    public BigDecimal getMaxFare(Station startStation) {
+        return fareRepository.findByStartZoneAndEndZoneAndIsPeak(startStation.getZone(), 3, true)
+                .orElseThrow().getFare();
     }
 
     private boolean isPeakHour(LocalDateTime dateTime) {
