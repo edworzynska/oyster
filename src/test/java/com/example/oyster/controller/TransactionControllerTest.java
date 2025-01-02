@@ -50,6 +50,9 @@ class TransactionControllerTest {
     @Autowired
     private DailyCapRepository dailyCapRepository;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
 
     private Card card;
     private Station startStation;
@@ -160,7 +163,9 @@ class TransactionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(startStation)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Card not found"));
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.message").value("Card not found"));
     }
 
     @Test
@@ -170,7 +175,9 @@ class TransactionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(endStation)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Transaction not found"));
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.message").value("Transaction not found"));
     }
     @Test
     @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -182,15 +189,56 @@ class TransactionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(endStation)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Insufficient balance"));
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Insufficient balance"));
     }
     @Test
     @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void testGetTransactionHistory_Pagination() throws Exception {
+    public void testGetTransactionHistory() throws Exception {
         card.setUser(testUser);
         cardRepository.save(card);
 
         mockMvc.perform(get("/api/transactions/card/123456789012"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.pageable").exists())
+                .andExpect(jsonPath("$.numberOfElements").value("0"));
+    }
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    public void testGetTransactionDetails() throws Exception {
+        card.setUser(testUser);
+        cardRepository.save(card);
+        Transaction testTransaction = new Transaction();
+        testTransaction.setFare(BigDecimal.TWO);
+        testTransaction.setStartStation(startStation);
+        testTransaction.setEndStation(endStation);
+        testTransaction.setCard(card);
+        transactionRepository.save(testTransaction);
+
+        Long testTransactionId = testTransaction.getId();
+
+        mockMvc.perform(get("/api/transactions/{testTransactionId}", testTransactionId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fare").value("2"))
+                .andExpect(jsonPath("$.startStation").exists())
+                .andExpect(jsonPath("$.cardNumber").value(card.getCardNumber()))
+                .andExpect(jsonPath("$.startAt").exists());
+    }
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    public void testGetTransactionDetailsIfDoesntExist() throws Exception {
+        card.setUser(testUser);
+        cardRepository.save(card);
+
+        Long testTransactionId = 777666555L;
+
+        mockMvc.perform(get("/api/transactions/{testTransactionId}", testTransactionId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.message").value("Transaction not found"));
+
     }
 }
