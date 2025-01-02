@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class Transaction {
     @Column(name = "start_time", updatable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time", updatable = false)
+    @Column(name = "end_time")
     private LocalDateTime endTime;
 
 }

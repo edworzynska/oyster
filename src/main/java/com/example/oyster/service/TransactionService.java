@@ -2,10 +2,7 @@ package com.example.oyster.service;
 
 import com.example.oyster.dto.TransactionDTO;
 import com.example.oyster.dto.TransactionMapper;
-import com.example.oyster.model.Card;
-import com.example.oyster.model.DailyCap;
-import com.example.oyster.model.Station;
-import com.example.oyster.model.Transaction;
+import com.example.oyster.model.*;
 import com.example.oyster.repository.CardRepository;
 import com.example.oyster.repository.DailyCapRepository;
 import com.example.oyster.repository.TransactionRepository;
@@ -13,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,23 +100,36 @@ public class TransactionService {
         BigDecimal dailyCap = dailyCapRepository
                 .findByStartZoneAndEndZone(startStation.getZone(), endStation.getZone())
                 .map(DailyCap::getDailyCap)
-                .orElseThrow(() -> new IllegalArgumentException("No daily cap found for the given zones."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No daily cap found for zones " + startStation.getZone() + " to " + endStation.getZone()
+                ));
 
-        List<Transaction> transactionsFromDay = transactionRepository.findAllByCardAndStartTimeBetween(
-                        card, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
-                );
-        BigDecimal totalDailyFare = transactionsFromDay.stream()
+        BigDecimal totalDailyFare = transactionRepository
+                .findAllByCardAndStartTimeBetween(card, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay())
+                .stream()
                 .map(Transaction::getFare)
-                .filter(Objects::nonNull) // Ensure no null values
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return totalDailyFare.add(fare).compareTo(dailyCap) > 0
-                ? dailyCap.subtract(totalDailyFare)
-                : fare;
+        if (totalDailyFare.add(fare).compareTo(dailyCap) > 0) {
+            return dailyCap.subtract(totalDailyFare);
+        }
+
+        return fare;
     }
 
     public Page<TransactionDTO> getAllTransactionsForCard(Long cardNumber, int page, int size) {
         Page<Transaction> transactionPage = transactionRepository.findByCardCardNumber(cardNumber, PageRequest.of(page, size));
         return transactionPage.map(transactionMapper::toDTO);
+    }
+
+    public TransactionDTO getTransactionDetails(Long transactionId, User loggedUser){
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() ->
+                new EntityNotFoundException("Transaction not found"));
+        if (!transaction.getCard().getUser().equals(loggedUser)) {
+            throw new AuthorizationDeniedException("No permission to view the details of this transaction");
+        }
+
+        return transactionMapper.toDTO(transaction);
     }
 }

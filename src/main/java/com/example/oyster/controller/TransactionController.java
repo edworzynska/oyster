@@ -3,6 +3,7 @@ package com.example.oyster.controller;
 import com.example.oyster.dto.TransactionDTO;
 import com.example.oyster.model.Card;
 import com.example.oyster.model.Station;
+import com.example.oyster.model.User;
 import com.example.oyster.repository.CardRepository;
 import com.example.oyster.service.AuthenticationService;
 import com.example.oyster.service.TransactionService;
@@ -40,7 +41,7 @@ public class TransactionController {
         TransactionDTO transaction = transactionService.tapOut(cardNumber, endStation);
         return ResponseEntity.ok(transaction);
     }
-    @GetMapping("/{cardNumber}")
+    @GetMapping("/card/{cardNumber}")
     public ResponseEntity<Page<TransactionDTO>> getTransactionHistory(
             @PathVariable Long cardNumber,
             @RequestParam(defaultValue = "0") int page,
@@ -52,5 +53,14 @@ public class TransactionController {
         }
         Page<TransactionDTO> transactions = transactionService.getAllTransactionsForCard(cardNumber, page, size);
         return ResponseEntity.ok(transactions);
+    }
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long transactionId) {
+        User loggedUser = authenticationService.getLoggedUser();
+
+        TransactionDTO transactionDTO = transactionService
+                .getTransactionDetails(transactionId, loggedUser);
+
+        return ResponseEntity.ok(transactionDTO);
     }
 }

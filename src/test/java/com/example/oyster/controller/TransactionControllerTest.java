@@ -190,7 +190,7 @@ class TransactionControllerTest {
         card.setUser(testUser);
         cardRepository.save(card);
 
-        mockMvc.perform(get("/api/transactions/123456789012"))
+        mockMvc.perform(get("/api/transactions/card/123456789012"))
                 .andExpect(status().isOk());
     }
 }
