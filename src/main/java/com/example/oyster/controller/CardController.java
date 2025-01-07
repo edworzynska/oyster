@@ -76,9 +76,6 @@ public class CardController {
     @PutMapping("/{cardNumber}")
     public ResponseEntity<Void> addBalance(@PathVariable Long cardNumber,
                                            @RequestParam BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
         cardService.addBalance(cardNumber, amount);
         return ResponseEntity.ok().build();
     }

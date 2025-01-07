@@ -8,6 +8,8 @@ import com.example.oyster.repository.CardRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,9 @@ public class CardService {
 
     @Autowired
     private CardMapper cardMapper;
+
+    @Autowired
+    private TransactionService transactionService;
 
     public CardDTO getCard(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() ->
@@ -87,8 +92,14 @@ public class CardService {
     public void addBalance(Long cardNumber, BigDecimal amount){
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new InvalidParameterException("invalid card number"));
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 ||
+                amount.scale() > 2) {
+            throw new InvalidParameterException("invalid top up value");
+        }
 
         card.setBalance(card.getBalance().add(amount));
         cardRepository.save(card);
+
+        transactionService.topUp(card, amount);
     }
 }

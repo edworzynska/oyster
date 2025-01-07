@@ -215,6 +215,7 @@ class TransactionControllerTest {
         testTransaction.setStartStation(startStation);
         testTransaction.setEndStation(endStation);
         testTransaction.setCard(card);
+        testTransaction.setTransactionType(TransactionType.CHARGE);
         transactionRepository.save(testTransaction);
 
         Long testTransactionId = testTransaction.getId();

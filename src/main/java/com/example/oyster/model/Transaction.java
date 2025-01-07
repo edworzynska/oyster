@@ -23,22 +23,30 @@ public class Transaction {
     @JoinColumn(name = "card_id")
     private Card card;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type", nullable = false)
+    private TransactionType transactionType;
+
     @ManyToOne
-    @JoinColumn(name = "start_station")
+    @JoinColumn(name = "start_station", nullable = true)
     private Station startStation;
 
     @ManyToOne
-    @JoinColumn(name = "end_station")
+    @JoinColumn(name = "end_station", nullable = true)
     private Station endStation;
 
-    @Column(name = "fare", precision = 19, scale = 2)
+    @Column(name = "fare", precision = 19, scale = 2, nullable = true)
     private BigDecimal fare;
+
+    @Column(name = "top_up_amount", precision = 19, scale = 2, nullable = true) // Only for top-ups
+    private BigDecimal topUpAmount;
 
     @CreationTimestamp
     @Column(name = "start_time", updatable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = true)
     private LocalDateTime endTime;
 
 }
+

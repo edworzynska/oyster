@@ -16,6 +16,8 @@ public abstract class TransactionMapper {
     @Mapping(target = "cardNumber", source = "card.cardNumber")
     @Mapping(target = "startAt", source = "startTime")
     @Mapping(target = "endAt", source = "endTime")
+    @Mapping(target = "topUpAmount", source = "topUpAmount")
+    @Mapping(target = "transactionType", source = "transactionType")
     public abstract TransactionDTO toDTO(Transaction transaction);
 
     @Mapping(target = "card", expression = "java(cardRepository.findById(transactionDTO.getCardId()).orElse(null))")

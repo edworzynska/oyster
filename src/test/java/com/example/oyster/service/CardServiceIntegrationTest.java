@@ -173,4 +173,18 @@ public class CardServiceIntegrationTest {
                 cardService.addBalance(cardNumber, new BigDecimal(15)));
         assertEquals("invalid card number", e.getMessage());
     }
+
+    @Test
+    void throwsInvalidParameterExceptionIfAmountIsInvalid() {
+        CardDTO cardDTO = cardService.createUnregisteredCard();
+        Long cardNumber = cardDTO.getCardNumber();
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("invalid card number"));
+
+        assertEquals(BigDecimal.ZERO, card.getBalance());
+
+        InvalidParameterException e = assertThrows(InvalidParameterException.class, () ->
+                cardService.addBalance(cardNumber, BigDecimal.valueOf(12.5678)));
+        assertEquals("invalid top up value", e.getMessage());
+    }
 }
