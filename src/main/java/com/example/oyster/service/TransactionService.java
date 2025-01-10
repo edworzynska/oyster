@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +45,10 @@ public class TransactionService {
     public TransactionDTO tapIn(Long cardNumber, Station startStation) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+
+        if (!card.getIsActive()){
+            throw new InvalidParameterException("The card is inactive!");
+        }
 
         if (card.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Insufficient balance");
@@ -79,6 +84,10 @@ public class TransactionService {
     public TransactionDTO tapOut(Long cardNumber, Station endStation) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+
+        if (!card.getIsActive()){
+            throw new InvalidParameterException("The card is inactive!");
+        }
 
         Transaction transaction = transactionRepository.findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(card)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));

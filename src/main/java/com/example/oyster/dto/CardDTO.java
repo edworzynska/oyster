@@ -13,5 +13,6 @@ public class CardDTO {
     Long userId;
     LocalDateTime issuedAt;
     BigDecimal balance;
+    Boolean isActive;
 
 }

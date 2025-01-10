@@ -41,7 +41,7 @@ class CardServiceTest {
         Card card = new Card(123456789L);
         card.setId(cardId);
 
-        CardDTO cardDTO = new CardDTO(cardId, 123456789L, null, null, BigDecimal.ZERO);
+        CardDTO cardDTO = new CardDTO(cardId, 123456789L, null, null, BigDecimal.ZERO, true);
 
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         when(cardMapper.toDTO(card)).thenReturn(cardDTO);
@@ -73,7 +73,7 @@ class CardServiceTest {
         Card card = new Card(123456789L);
         card.setUser(user);
 
-        CardDTO cardDTO = new CardDTO(1L, 123456789L, user.getId(), null, BigDecimal.ZERO);
+        CardDTO cardDTO = new CardDTO(1L, 123456789L, user.getId(), null, BigDecimal.ZERO, true);
 
         when(cardRepository.existsByCardNumber(anyLong())).thenReturn(false);
         when(cardRepository.save(any(Card.class))).thenReturn(card);
@@ -99,7 +99,7 @@ class CardServiceTest {
         card.setId(1L);
         card.setUser(user);
 
-        CardDTO cardDTO = new CardDTO(1L, generatedCardNumber, user.getId(), null, BigDecimal.ZERO);
+        CardDTO cardDTO = new CardDTO(1L, generatedCardNumber, user.getId(), null, BigDecimal.ZERO, true);
 
         when(cardRepository.existsByCardNumber(anyLong())).thenReturn(false);
         when(cardRepository.save(any(Card.class))).thenReturn(card);

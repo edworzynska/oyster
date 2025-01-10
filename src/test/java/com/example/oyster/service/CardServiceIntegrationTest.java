@@ -187,4 +187,28 @@ public class CardServiceIntegrationTest {
                 cardService.addBalance(cardNumber, BigDecimal.valueOf(12.5678)));
         assertEquals("invalid top up value", e.getMessage());
     }
+
+    @Test
+    void blocksCard() {
+        CardDTO cardDTO = cardService.createRegisteredCard(testUser);
+        assertTrue(cardDTO.getIsActive());
+        Long cardNumber = cardDTO.getCardNumber();
+        cardService.blockCard(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow();
+        assertFalse(card.getIsActive());
+    }
+
+    @Test
+    void cannotTopUpBlockedCard() {
+        CardDTO cardDTO = cardService.createRegisteredCard(testUser);
+        assertTrue(cardDTO.getIsActive());
+        Long cardNumber = cardDTO.getCardNumber();
+        cardService.blockCard(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow();
+        assertFalse(card.getIsActive());
+
+        InvalidParameterException e = assertThrows(InvalidParameterException.class, () ->
+                cardService.addBalance(cardNumber, BigDecimal.TEN));
+        assertEquals("The card is inactive!", e.getMessage());
+    }
 }

@@ -96,10 +96,26 @@ public class CardService {
                 amount.scale() > 2) {
             throw new InvalidParameterException("invalid top up value");
         }
+        if (!card.getIsActive()){
+            throw new InvalidParameterException("The card is inactive!");
+        }
 
         card.setBalance(card.getBalance().add(amount));
         cardRepository.save(card);
 
         transactionService.topUp(card, amount);
+    }
+
+    @Transactional
+    public void blockCard(Long cardNumber){
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new InvalidParameterException("invalid card number"));
+        if (!card.getIsActive()){
+            throw new InvalidParameterException("card is already blocked");
+        }
+
+        card.setIsActive(false);
+
+        cardRepository.save(card);
     }
 }

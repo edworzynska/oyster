@@ -34,6 +34,9 @@ public class Card {
     @Column(name = "balance", precision = 19, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
     public Card(Long cardNumber) {
         this.cardNumber = cardNumber;
     }
