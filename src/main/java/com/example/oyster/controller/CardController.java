@@ -79,4 +79,10 @@ public class CardController {
         cardService.addBalance(cardNumber, amount);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/block/{cardNumber}")
+    public ResponseEntity<String> blockCard(@PathVariable Long cardNumber) {
+
+        cardService.blockCard(cardNumber);
+        return ResponseEntity.ok().build();
+    }
 }

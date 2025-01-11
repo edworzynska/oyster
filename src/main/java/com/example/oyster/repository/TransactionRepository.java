@@ -15,4 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Optional<Transaction> findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(Card card);
     List<Transaction> findAllByCardAndStartTimeBetween(Card card, LocalDateTime startTime, LocalDateTime endTime);
     Page<Transaction> findByCardCardNumber(Long cardNumber, Pageable pageable);
+    Page<Transaction> findAllByCardAndStartTimeBetween(Card card, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+
+
 }

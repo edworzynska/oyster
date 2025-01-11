@@ -13,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -59,8 +63,38 @@ public class FareServiceTest {
     }
 
     @Test
-    void calculatesFare() {
-        BigDecimal result = fareService.calculateFare(station1, station2);
-        System.out.println(result);
+    void throwsExceptionIfNoFareForGivenZones() {
+        Station station3 = new Station();
+        station3.setName("Station 3");
+        station3.setZone(3);
+        stationRepository.save(station3);
+
+        Station station4 = new Station();
+        station4.setName("Station 4");
+        station4.setZone(4);
+        stationRepository.save(station4);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
+                fareService.calculateFare(station3, station4));
+        assertEquals("Fare not defined for zones 3 to 4 (peak: false)", e.getMessage());
     }
+
+    @Test
+    void getsMaxFareForStartZone() {
+        BigDecimal maxFare = fareService.getMaxFare(station1);
+        assertEquals(BigDecimal.valueOf(3.00), maxFare);
+    }
+
+    @Test
+    void throwsExceptionIfNoFareForStartZone() {
+        Station station5 = new Station();
+        station5.setName("Station 5");
+        station5.setZone(5);
+        stationRepository.save(station5);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
+                fareService.getMaxFare(station5));
+        assertEquals("No fare data available for start zone: 5", e.getMessage());
+    }
+
 }

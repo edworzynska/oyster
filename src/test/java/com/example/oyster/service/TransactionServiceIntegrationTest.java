@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -186,5 +187,46 @@ public class TransactionServiceIntegrationTest {
         EntityNotFoundException e = assertThrows(EntityNotFoundException.class, () ->
                 transactionService.tapIn(444L, station1));
         assertEquals("Card not found", e.getMessage());
+    }
+    @Test
+    void throwsInvalidParameterExceptionIfCardIsInactive() {
+        card1.setIsActive(false);
+        cardRepository.save(card1);
+        Long cardNumber = card1.getCardNumber();
+        InvalidParameterException e = assertThrows(InvalidParameterException.class, () ->
+                transactionService.tapIn(cardNumber, station1));
+        assertEquals("The card is inactive!", e.getMessage());
+    }
+    @Test
+    void throwsEntityNotFoundExceptionIfTransactionAlreadyHasEndStation() {
+        Long cardNumber = card1.getCardNumber();
+        transactionService.tapIn(cardNumber, station1);
+        transactionService.tapOut(cardNumber, station2);
+        EntityNotFoundException e = assertThrows(EntityNotFoundException.class, () ->
+                transactionService.tapOut(cardNumber, station1));
+        assertEquals("Transaction not found", e.getMessage());
+    }
+    @Test
+    void topUpCardSuccessfully() {
+        Long cardNumber = card1.getCardNumber();
+        BigDecimal amount = BigDecimal.valueOf(10.00);
+        TransactionDTO topUpTransaction = transactionService.topUp(card1, amount);
+        assertEquals(cardNumber, topUpTransaction.getCardNumber());
+        assertEquals(amount, topUpTransaction.getTopUpAmount());
+    }
+    @Test
+    void fareCannotExceedDailyCapExactly() {
+        Long cardNumber = card1.getCardNumber();
+
+        transactionService.tapIn(cardNumber, station1);
+        transactionService.tapOut(cardNumber, station2);
+
+        transactionService.tapIn(cardNumber, station1);
+        transactionService.tapOut(cardNumber, station2);
+
+        TransactionDTO transaction = transactionService.tapIn(cardNumber, station1);
+        TransactionDTO transaction2 = transactionService.tapOut(cardNumber, station2);
+
+        assertEquals(BigDecimal.valueOf(0.0), transaction2.getFare());
     }
 }

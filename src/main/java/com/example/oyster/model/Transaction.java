@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -38,7 +37,7 @@ public class Transaction {
     @Column(name = "fare", precision = 19, scale = 2, nullable = true)
     private BigDecimal fare;
 
-    @Column(name = "top_up_amount", precision = 19, scale = 2, nullable = true) // Only for top-ups
+    @Column(name = "top_up_amount", precision = 19, scale = 2, nullable = true)
     private BigDecimal topUpAmount;
 
     @CreationTimestamp

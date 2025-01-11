@@ -112,6 +112,7 @@ public class TransactionService {
         Transaction topUp = new Transaction();
         topUp.setTransactionType(TransactionType.TOP_UP);
         topUp.setCard(card);
+        topUp.setTopUpAmount(amount);
         transactionRepository.save(topUp);
 
         return transactionMapper.toDTO(topUp);
@@ -142,6 +143,14 @@ public class TransactionService {
 
     public Page<TransactionDTO> getAllTransactionsForCard(Long cardNumber, int page, int size) {
         Page<Transaction> transactionPage = transactionRepository.findByCardCardNumber(cardNumber, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startTime")));
+        return transactionPage.map(transactionMapper::toDTO);
+    }
+
+    public Page<TransactionDTO> getAllTransactionsForCardWithinDateRange(Long cardNumber, LocalDateTime start, LocalDateTime end, int page, int size) {
+        Page<Transaction> transactionPage = transactionRepository.findAllByCardAndStartTimeBetween(
+                cardRepository.findByCardNumber(cardNumber).orElseThrow(), start, end,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startTime")));
+
         return transactionPage.map(transactionMapper::toDTO);
     }
 

@@ -1,12 +1,9 @@
 package com.example.oyster.dto;
 
 import com.example.oyster.model.Card;
-import com.example.oyster.model.User;
 import com.example.oyster.repository.UserRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")

@@ -34,7 +34,7 @@ public class UserService {
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
 
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
+        if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
             throw new EntityExistsException("An account with this email address already exists!");
         }
         if (!validateEmailAddress(userDTO.getEmail())) {
@@ -43,7 +43,7 @@ public class UserService {
         if (!validatePassword(userDTO.getPassword()) || userDTO.getPassword().isEmpty()){
             throw new InvalidParameterException("Password must be at least 8 characters long, must contain at least one special character, one letter and one number!");
         }
-
+        userDTO.setEmail(userDTO.getEmail().toLowerCase());
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(user);

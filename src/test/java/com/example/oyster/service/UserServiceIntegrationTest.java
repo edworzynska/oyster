@@ -49,6 +49,19 @@ class UserServiceIntegrationTest {
 
     }
     @Test
+    void createsUserWithPasswordEncoded() {
+        String firstName = "First Name";
+        String lastName = "Last Name";
+        String email = "test@test";
+        String password = "Password1!";
+
+        UserDTO createdUser = userService.createUser(new UserDTO(firstName, lastName, email, password));
+
+        assertNotNull(createdUser);
+        assertNotEquals(password, createdUser.getPassword());
+    }
+
+    @Test
     void throwsAnErrorIfCreatingUserWithInvalidEmailAddress() {
         String firstName = "First Test";
         String lastName = "Last Test";
@@ -58,6 +71,28 @@ class UserServiceIntegrationTest {
         InvalidParameterException e = assertThrows(InvalidParameterException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
         assertEquals("Provided email address is invalid!", e.getMessage());
     }
+    @Test
+    void throwsAnErrorIfCreatingUserWithNullFirstName() {
+        String firstName = null;
+        String lastName = "Last Test";
+        String email = "test@test";
+        String password = "Password1!";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        assertEquals("First name cannot be empty", e.getMessage());
+    }
+
+    @Test
+    void throwsAnErrorIfCreatingUserWithNullLastName() {
+        String firstName = "First Test";
+        String lastName = null;
+        String email = "test@test";
+        String password = "Password1!";
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> userService.createUser(new UserDTO(firstName, lastName, email, password)));
+        assertEquals("Last name cannot be empty", e.getMessage());
+    }
+
     @Test
     void throwsAnErrorIfCreatingUserBlankEmailAddress() {
         String firstName = "First Test";
@@ -79,6 +114,19 @@ class UserServiceIntegrationTest {
         EntityExistsException e = assertThrows(EntityExistsException.class, ()->userService.createUser(new UserDTO(firstName, lastName, email, password)));
         assertEquals("An account with this email address already exists!", e.getMessage());
     }
+    @Test
+    void throwsAnErrorIfEmailIsCaseInsensitiveDuplicate() {
+        String firstName = "First Test";
+        String lastName = "Last Test";
+        String email1 = "test@email.com";
+        String email2 = "TEST@email.com";
+        String password = "Password1!";
+
+        userService.createUser(new UserDTO(firstName, lastName, email1, password));
+        EntityExistsException e = assertThrows(EntityExistsException.class, () -> userService.createUser(new UserDTO(firstName, lastName, email2, password)));
+        assertEquals("An account with this email address already exists!", e.getMessage());
+    }
+
     @Test
     void throwsAnErrorIfCreatingUserWithBlankFirstName() {
         String firstName = "     ";

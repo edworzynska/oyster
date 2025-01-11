@@ -147,7 +147,7 @@ public class CardControllerTest {
                 .andExpect(status().isOk());
 
         Card updatedCard = cardRepository.findById(testCard.getId()).orElseThrow();
-        BigDecimal expectedBalance = BigDecimal.valueOf(150.00); // 100 + 50
+        BigDecimal expectedBalance = BigDecimal.valueOf(150.00);
         assert updatedCard.getBalance().compareTo(expectedBalance) == 0;
     }
 
@@ -163,8 +163,44 @@ public class CardControllerTest {
     @Test
     @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testAddBalance_InvalidCardNumber() throws Exception {
-        mockMvc.perform(put("/api/cards/{cardNumber}", 99L)  // Non-existent card number
+        mockMvc.perform(put("/api/cards/{cardNumber}", 99L)
                         .param("amount", "10.00")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testAddBalance_ZeroAmount() throws Exception {
+        mockMvc.perform(put("/api/cards/{cardNumber}", testCard.getCardNumber())
+                        .param("amount", "0.00")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        Card updatedCard = cardRepository.findById(testCard.getId()).orElseThrow();
+        assert updatedCard.getBalance().compareTo(BigDecimal.valueOf(100.00)) == 0;
+    }
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testBlockCard() throws Exception {
+        mockMvc.perform(put("/api/cards/block/{cardNumber}", testCard.getCardNumber())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+    }
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testGetCards() throws Exception {
+        mockMvc.perform(get("/api/cards/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].userId", is(testUser.getId().intValue())))
+                .andExpect(jsonPath("$[0].cardNumber", is(testCard.getCardNumber())));
+    }
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testRegisterCard_AlreadyRegistered() throws Exception {
+        mockMvc.perform(post("/api/cards/number/{cardNumber}", testCard.getCardNumber())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

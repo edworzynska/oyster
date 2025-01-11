@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -242,4 +243,35 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.message").value("Transaction not found"));
 
     }
+
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void tapOutWithPeakFare() throws Exception {
+        mockMvc.perform(post("/api/transactions/" + card.getCardNumber() + "/tapIn")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(startStation)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/transactions/" + card.getCardNumber() + "/tapOut")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(endStation)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fare").value(BigDecimal.valueOf(2.50)));
+    }
+
+    @Test
+    @WithUserDetails(value = "johndoe@example.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void getTransactionHistoryWithDateRange() throws Exception {
+        LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2024, 12, 31, 23, 59, 59, 999999);
+
+        mockMvc.perform(get("/api/transactions/card/123456789012")
+                        .param("startDate", startDate.toString())
+                        .param("endDate", endDate.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.pageable").exists())
+                .andExpect(jsonPath("$.numberOfElements").value("0"));
+    }
+
 }

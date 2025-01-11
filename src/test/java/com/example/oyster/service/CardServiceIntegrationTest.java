@@ -211,4 +211,24 @@ public class CardServiceIntegrationTest {
                 cardService.addBalance(cardNumber, BigDecimal.TEN));
         assertEquals("The card is inactive!", e.getMessage());
     }
+
+    @Test
+    void returnsEmptyListIfUserHasNoCards() {
+        List<CardDTO> cards = cardService.getCardsByUser(testUser);
+        assertTrue(cards.isEmpty());
+    }
+
+    @Test
+    void cannotBlockAlreadyBlockedCard() {
+        CardDTO cardDTO = cardService.createRegisteredCard(testUser);
+        Long cardNumber = cardDTO.getCardNumber();
+        cardService.blockCard(cardNumber);
+        Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow();
+        assertFalse(card.getIsActive());
+
+        InvalidParameterException e = assertThrows(InvalidParameterException.class, () ->
+                cardService.blockCard(cardNumber));
+        assertEquals("card is already blocked", e.getMessage());
+    }
+
 }
