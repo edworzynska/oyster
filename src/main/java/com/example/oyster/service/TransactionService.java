@@ -55,7 +55,7 @@ public class TransactionService {
         }
 
         Optional<Transaction> incompleteTransactionOpt = transactionRepository
-                .findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(card);
+                .findFirstByCardAndEndStationIsNullAndTransactionTypeOrderByStartTimeDesc(card, TransactionType.CHARGE);
 
         if (incompleteTransactionOpt.isPresent()) {
             Transaction incompleteTransaction = incompleteTransactionOpt.get();
@@ -89,7 +89,7 @@ public class TransactionService {
             throw new InvalidParameterException("The card is inactive!");
         }
 
-        Transaction transaction = transactionRepository.findFirstByCardAndEndStationIsNullOrderByStartTimeDesc(card)
+        Transaction transaction = transactionRepository.findFirstByCardAndEndStationIsNullAndTransactionTypeOrderByStartTimeDesc(card, TransactionType.CHARGE)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
 
         transaction.setEndStation(endStation);
