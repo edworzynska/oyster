@@ -70,28 +70,47 @@ As this was my first project using Swift and developing an iOS app, I learned se
 
 ## Screenshots   
 
-![Registration](./screenshots/registration.png)   
-**Registration form**
+<img src="./screenshots/registration.png" alt="regitration form" width="300"/>    
+
+Registration form    
+
+
  
-![Login Form](./screenshots/login.png)   
-**Login form**
+<img src="./screenshots/login.png" alt="login form" width="300"/>    
 
-![Dashboard view](./screenshots/dashboard.png)   
-**Dashboard view**: a view displayed after successful login. Users can select their card and use it to tap in or tap out at the selected station.
+Login form      
 
-![Card management view](./screenshots/card_management_view.png)   
-**Card management view**: a view where users can issue a new card, register a card, block it and view most recent transactions.   
 
-![New card alert](./screenshots/new_card_alert.png)
-**New card alert**: users are asked to confirm their request to issue new card.  
 
-![Top up view](./screenshots/top_up_view.png)   
-**Top up view**: users can top up card selected in Card Management View here.
+<img src="./screenshots/dashboard.png" alt="dashboard" width="300"/>  
 
-![Transactions view](./screenshots/transaction_view.png)
-**Transaction view**: users can find all transactions made with selected card here, filter them by dates and view the details such as fare and stations.  
+Dashboard view: a view displayed after successful login. Users can select their card and use it to tap in or tap out at the selected station.     
 
-![Error alert](./screenshots/alert.png)
-![Success alert](./screenshots/success_alert.png)   
-**Error and success alerts**: users receive relevant messages in case of error or success.
+
+ 
+<img src="./screenshots/card_management_view.png" alt="card management view" width="300"/>  
+
+Card management view: a view where users can issue a new card, register a card, block it and view most recent transactions.   
+
+
+<img src="./screenshots/new_card_alert.png" alt="new card alert" width="300"/>  
+
+New card alert: users are asked to confirm their request to issue new card.  
+
+  
+<img src="./screenshots/top_up_view.png" alt="top up view" width="300"/>  
+
+Top up view: users can top up card selected in Card Management View here.
+
+
+<img src="./screenshots/transactions_view.png" alt="transaction view" width="300"/>  
+
+Transaction view: users can find all transactions made with selected card here, filter them by dates and view the details such as fare and stations.  
+
+
+<img src="./screenshots/alert.png" alt="alert" width="300"/>  
+
+<img src="./screenshots/success_alert.png" alt="success alert" width="300"/>  
+
+Error and success alerts: users receive relevant messages in case of error or success.
 
