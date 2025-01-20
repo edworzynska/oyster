@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +77,7 @@ public class FareServiceTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
                 fareService.calculateFare(station3, station4));
-        assertEquals("Fare not defined for zones 3 to 4 (peak: false)", e.getMessage());
+        assertEquals(String.format("Fare not defined for zones 3 to 4 (peak: %s)", fareService.isPeakHour(LocalDateTime.now())), e.getMessage());
     }
 
     @Test

@@ -38,7 +38,7 @@ public class FareService {
                 ));
     }
 
-    private boolean isPeakHour(LocalDateTime dateTime) {
+    public boolean isPeakHour(LocalDateTime dateTime) {
         int hour = dateTime.getHour();
         int minute = dateTime.getMinute();
         int totalMinutes = hour * 60 + minute;

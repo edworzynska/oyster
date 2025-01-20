@@ -46,18 +46,18 @@ As this was my first project using Swift and developing an iOS app, I learned se
 - Java JDK 21
 - Gradle
 - PostgreSQL (H2 is only used for testing)
-- Xcode: Required to run the iOS app.
+- Xcode: Required to run the iOS app
   
 ### Steps
-#### Running the server:
+#### Running the backend:
 - Clone the Repository:   
-  <code> git clone --recursive https://github.com/edworzynska/oyster.git</code>
+  <code> git clone https://github.com/edworzynska/oyster.git</code>
 - Create PostgreSQL Database:   
   Set up a new PostgreSQL database for the application.
 - Build and Run the Application:   
   Navigate to the project directory and use Gradle to build and run the app:   
-  <code>./gradlew build</code>   
-  <code>./gradlew run </code>    
+  <code>./gradlew build</code> to build the app and run the tests      
+  <code>./gradlew bootrun </code>    
   The application will start on the default port: http://localhost:8080
 #### Running the iOS App:
 - Clone the Repository:   
@@ -66,3 +66,32 @@ As this was my first project using Swift and developing an iOS app, I learned se
   Open the project in Xcode.
 - Run the App:   
   Build and run the app on a simulator or physical device through Xcode.
+
+
+## Screenshots   
+
+![Registration](./screenshots/registration.png)   
+**Registration form**
+ 
+![Login Form](./screenshots/login.png)   
+**Login form**
+
+![Dashboard view](./screenshots/dashboard.png)   
+**Dashboard view**: a view displayed after successful login. Users can select their card and use it to tap in or tap out at the selected station.
+
+![Card management view](./screenshots/card_management_view.png)   
+**Card management view**: a view where users can issue a new card, register a card, block it and view most recent transactions.   
+
+![New card alert](./screenshots/new_card_alert.png)
+**New card alert**: users are asked to confirm their request to issue new card.  
+
+![Top up view](./screenshots/top_up_view.png)   
+**Top up view**: users can top up card selected in Card Management View here.
+
+![Transactions view](./screenshots/transaction_view.png)
+**Transaction view**: users can find all transactions made with selected card here, filter them by dates and view the details such as fare and stations.  
+
+![Error alert](./screenshots/alert.png)
+![Success alert](./screenshots/success_alert.png)   
+**Error and success alerts**: users receive relevant messages in case of error or success.
+
